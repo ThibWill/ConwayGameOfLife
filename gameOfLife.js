@@ -14,34 +14,29 @@ window.onload = () => {
   }
   let stateGrid = Array(GRID.length).fill('').map(e=>Array(GRID.height).fill(false));
 
-  canvas.addEventListener('click', (e)=> {
-    stateGrid[Math.floor(e.offsetX/SIZE_CELL)][Math.floor(e.offsetY/SIZE_CELL)] = true;
-    drawGrid(); 
-  })
-  stateGrid[20][11] = true;
-  stateGrid[20][12] = true;
-  stateGrid[20][13] = true;
-  stateGrid[20][14] = true;
-  stateGrid[20][15] = true;
-  stateGrid[20][16] = true;
-  stateGrid[20][17] = true;
-
   function drawGrid() {
-    context.strokeStyle='#FFDAC1';
-    context.fillStyle='grey';
+    context.strokeStyle = '#FFDAC1';
+    context.fillStyle = 'grey';
     context.clearRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
     for (let i = 0; i < stateGrid.length; i++) {
       for (let j = 0; j < stateGrid[i].length; j++) {
         if (!stateGrid[i][j]) {
           context.fillRect(i * SIZE_CELL, j * SIZE_CELL, SIZE_CELL, SIZE_CELL);
           context.strokeRect(i * SIZE_CELL, j * SIZE_CELL, SIZE_CELL, SIZE_CELL);
-        } else {
-          
         }
       }
     }
   }
   drawGrid();
+
+  canvas.addEventListener('click', (e) => {
+    stateGrid[Math.floor(e.offsetX/SIZE_CELL)][Math.floor(e.offsetY/SIZE_CELL)] = true;
+    drawGrid(); 
+  });
+
+  /*window.addEventListener('resize', function() {
+    console.log("hello")
+  });*/
 
   function game() {
     function lifeOrDeath(x, y) {
@@ -56,12 +51,7 @@ window.onload = () => {
           }
         }
       }
-      if (!stateGrid[x][y] && neighbours === 3) {
-        return true;
-      } else if (stateGrid[x][y] && (neighbours === 2 || neighbours === 3)) {
-        return true;
-      }
-      return false;
+      return (!stateGrid[x][y] && neighbours === 3) || (stateGrid[x][y] && (neighbours === 2 || neighbours === 3));
     }
   
     return function gameOfLife() {
@@ -75,6 +65,26 @@ window.onload = () => {
       drawGrid();
     }
   }
-  setInterval(game(), 350);
+
+  (function launchGame() {
+    let interval;
+    function stopInterval() {
+      clearInterval(interval);
+      interval = undefined;
+    }
+    (function() {
+      document.getElementById('start').addEventListener('click', () => {
+        if(!interval) { interval = setInterval(game(), 350); }
+      });
+      document.getElementById('stop').addEventListener('click', () => {
+        stopInterval();
+      });
+      document.getElementById('reset').addEventListener('click', () => {
+        stateGrid = Array(GRID.length).fill('').map(e=>Array(GRID.height).fill(false));
+        stopInterval();
+        drawGrid();
+      });
+    })();
+  })();
 }
 

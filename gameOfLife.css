@@ -4,3 +4,12 @@ body {
   margin:0;
   overflow: hidden;
 }
+
+.options {
+  position: absolute;
+  right:30px;
+  top: 30px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+}
