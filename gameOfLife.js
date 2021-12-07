@@ -1,23 +1,21 @@
+/**
+ * @author Thibault Willer
+ * Date: 07/12/2021
+ */
 window.onload = () => {
-  const MAX_HEIGHT = window.innerHeight;
-  const MAX_WIDTH = window.innerWidth;
+  let maxHeight, maxWidth, grid, stateGrid;
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
-  canvas.height = MAX_HEIGHT;
-  canvas.width = MAX_WIDTH;
-  document.body.append(canvas);
-  
   const SIZE_CELL = 20;
-  const GRID = {
-    length: Math.ceil(MAX_WIDTH / SIZE_CELL),
-    height: Math.ceil(MAX_HEIGHT / SIZE_CELL)
-  }
-  let stateGrid = Array(GRID.length).fill('').map(e=>Array(GRID.height).fill(false));
+  document.body.append(canvas);
 
+  /**
+   * Draw the grid on the canvas
+   */
   function drawGrid() {
     context.strokeStyle = '#FFDAC1';
     context.fillStyle = 'grey';
-    context.clearRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
+    context.clearRect(0, 0, maxWidth, maxHeight);
     for (let i = 0; i < stateGrid.length; i++) {
       for (let j = 0; j < stateGrid[i].length; j++) {
         if (!stateGrid[i][j]) {
@@ -27,24 +25,44 @@ window.onload = () => {
       }
     }
   }
-  drawGrid();
 
-  canvas.addEventListener('click', (e) => {
-    stateGrid[Math.floor(e.offsetX/SIZE_CELL)][Math.floor(e.offsetY/SIZE_CELL)] = true;
-    drawGrid(); 
-  });
+  /**
+   * Initialize the canvas, and the model stateGrid
+   * which is a 2D array, fill with false.
+   * False => cell is dead
+   * True => cell is alive
+   */
+  function initialize() {
+    maxHeight = window.innerHeight;
+    maxWidth = window.innerWidth;
+    canvas.height = maxHeight;
+    canvas.width = maxWidth;
+    grid = {
+      length: Math.ceil(maxWidth / SIZE_CELL),
+      height: Math.ceil(maxHeight / SIZE_CELL)
+    }
+    stateGrid = Array(grid.length).fill('').map(e=>Array(grid.height).fill(false));
+    drawGrid();
+  }
+  initialize();
 
-  /*window.addEventListener('resize', function() {
-    console.log("hello")
-  });*/
-
+  /**
+   * Contains all the game's logic
+   * @returns function gameOfLife
+   */
   function game() {
+    /**
+     * Define if a cell will be alive or dead in the next round
+     * @param {number} x Coordinate x of the cell
+     * @param {number} y Coordinate y of the cell
+     * @returns {boolean}
+     */
     function lifeOrDeath(x, y) {
       let neighbours = 0;
       for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
-          if (x + i >= 0 && x + i < GRID.length && y + j >= 0 &&
-             y + j < GRID.height && !(i === 0 && j === 0)) {
+          if (x + i >= 0 && x + i < grid.length && y + j >= 0 &&
+             y + j < grid.height && !(i === 0 && j === 0)) {
             if (stateGrid[x + i][y + j]) {
               neighbours += 1;
             }
@@ -53,7 +71,10 @@ window.onload = () => {
       }
       return (!stateGrid[x][y] && neighbours === 3) || (stateGrid[x][y] && (neighbours === 2 || neighbours === 3));
     }
-  
+
+    /**
+     * Loop over all the cells to define for each one the state
+     */
     return function gameOfLife() {
       const cpyGrid = [...stateGrid.map(row=>[...row])];
       for (let i = 0; i < cpyGrid.length; i++) {
@@ -66,6 +87,19 @@ window.onload = () => {
     }
   }
 
+  // Event fired when a use resize the navigator
+  window.addEventListener('resize', initialize);
+
+  // Allow the user to change the state of a cell when clicking on it
+  canvas.addEventListener('click', (e) => {
+    stateGrid[Math.floor(e.offsetX/SIZE_CELL)][Math.floor(e.offsetY/SIZE_CELL)] = !stateGrid[Math.floor(e.offsetX/SIZE_CELL)][Math.floor(e.offsetY/SIZE_CELL)];
+    drawGrid(); 
+  });
+
+  /**
+   * Launch of the game
+   * Setup of the options (start, stop and reset)
+   */
   (function launchGame() {
     let interval;
     function stopInterval() {
@@ -80,9 +114,8 @@ window.onload = () => {
         stopInterval();
       });
       document.getElementById('reset').addEventListener('click', () => {
-        stateGrid = Array(GRID.length).fill('').map(e=>Array(GRID.height).fill(false));
+        initialize()
         stopInterval();
-        drawGrid();
       });
     })();
   })();

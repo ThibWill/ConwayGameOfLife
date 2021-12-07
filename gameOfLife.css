@@ -6,10 +6,20 @@ body {
 }
 
 .options {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   position: absolute;
   right:30px;
   top: 30px;
   background-color: white;
-  padding: 10px;
+  padding: 10px 20px 10px 20px;
   border-radius: 5px;
+}
+
+button {
+  background-color: white;
+  border: 0px white;
 }
