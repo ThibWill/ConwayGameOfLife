@@ -3,16 +3,17 @@
  * Date: 07/12/2021
  */
 window.onload = () => {
-  let maxHeight, maxWidth, grid, stateGrid;
+  const SIZE_CELL = 20;
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
-  const SIZE_CELL = 20;
+  let maxHeight, maxWidth, grid, stateGrid;
   document.body.append(canvas);
 
   /**
    * Draw the grid on the canvas
    */
-  function drawGrid() {
+  function drawGrid() 
+  {
     context.strokeStyle = '#FFDAC1';
     context.fillStyle = 'grey';
     context.clearRect(0, 0, maxWidth, maxHeight);
@@ -32,16 +33,16 @@ window.onload = () => {
    * False => cell is dead
    * True => cell is alive
    */
-  function initialize() {
-    maxHeight = window.innerHeight;
-    maxWidth = window.innerWidth;
+  function initialize() 
+  {
+    [maxHeight, maxWidth] = [window.innerHeight, window.innerWidth];
     canvas.height = maxHeight;
     canvas.width = maxWidth;
     grid = {
       length: Math.ceil(maxWidth / SIZE_CELL),
       height: Math.ceil(maxHeight / SIZE_CELL)
     }
-    stateGrid = Array(grid.length).fill('').map(e=>Array(grid.height).fill(false));
+    stateGrid = Array(grid.length).fill('').map(e => Array(grid.height).fill(false));
     drawGrid();
   }
   initialize();
@@ -57,15 +58,14 @@ window.onload = () => {
      * @param {number} y Coordinate y of the cell
      * @returns {boolean}
      */
-    function lifeOrDeath(x, y) {
+    function lifeOrDeath(x, y) 
+    {
       let neighbours = 0;
       for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
-          if (x + i >= 0 && x + i < grid.length && y + j >= 0 &&
-             y + j < grid.height && !(i === 0 && j === 0)) {
-            if (stateGrid[x + i][y + j]) {
+          if (x + i >= 0 && x + i < grid.length && y + j >= 0 && y + j < grid.height 
+            && !(i === 0 && j === 0) && stateGrid[x + i][y + j]) {
               neighbours += 1;
-            }
           }
         }
       }
@@ -73,16 +73,11 @@ window.onload = () => {
     }
 
     /**
-     * Loop over all the cells to define for each one the state
+     * Loop over all the cells to define for each one the next state
      */
-    return function gameOfLife() {
-      const cpyGrid = [...stateGrid.map(row=>[...row])];
-      for (let i = 0; i < cpyGrid.length; i++) {
-        for (let j = 0; j < cpyGrid[i].length; j++) {
-          cpyGrid[i][j] = lifeOrDeath(i, j);
-        }
-      }
-      stateGrid = cpyGrid;
+    return function gameOfLife() 
+    {
+      stateGrid = [...stateGrid.map(row => [...row])].map((row, x) => row.map((cell, y) => lifeOrDeath(x, y)));
       drawGrid();
     }
   }
@@ -92,7 +87,8 @@ window.onload = () => {
 
   // Allow the user to change the state of a cell when clicking on it
   canvas.addEventListener('click', (e) => {
-    stateGrid[Math.floor(e.offsetX/SIZE_CELL)][Math.floor(e.offsetY/SIZE_CELL)] = !stateGrid[Math.floor(e.offsetX/SIZE_CELL)][Math.floor(e.offsetY/SIZE_CELL)];
+    let [caseX, caseY] = [Math.floor(e.offsetX/SIZE_CELL), Math.floor(e.offsetY/SIZE_CELL)];
+    stateGrid[caseX][caseY] = !stateGrid[caseX][caseY];
     drawGrid(); 
   });
 
@@ -114,10 +110,9 @@ window.onload = () => {
         stopInterval();
       });
       document.getElementById('reset').addEventListener('click', () => {
-        initialize()
+        initialize();
         stopInterval();
       });
     })();
   })();
 }
-
