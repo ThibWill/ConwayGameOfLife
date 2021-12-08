@@ -6,7 +6,8 @@ window.onload = () => {
   const SIZE_CELL = 20;
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
-  let maxHeight, maxWidth, grid, stateGrid;
+  let maxHeight, maxWidth, grid;
+  let stateGrid = [];
   document.body.append(canvas);
 
   /**
@@ -14,8 +15,8 @@ window.onload = () => {
    */
   function drawGrid() 
   {
-    context.strokeStyle = '#FFDAC1';
-    context.fillStyle = 'grey';
+    context.strokeStyle = '#BEAFC2';
+    context.fillStyle = '#8155BA';
     context.clearRect(0, 0, maxWidth, maxHeight);
     for (let i = 0; i < stateGrid.length; i++) {
       for (let j = 0; j < stateGrid[i].length; j++) {
@@ -42,7 +43,8 @@ window.onload = () => {
       length: Math.ceil(maxWidth / SIZE_CELL),
       height: Math.ceil(maxHeight / SIZE_CELL)
     }
-    stateGrid = Array(grid.length).fill('').map(e => Array(grid.height).fill(false));
+    stateGrid = Array(grid.length).fill('').map((row, x) => Array(grid.height).fill(false)
+      .map((cell, y) => stateGrid[x] && stateGrid[x][y] ? stateGrid[x][y] : false));
     drawGrid();
   }
   initialize();
@@ -51,7 +53,8 @@ window.onload = () => {
    * Contains all the game's logic
    * @returns function gameOfLife
    */
-  function game() {
+  function game() 
+  {
     /**
      * Define if a cell will be alive or dead in the next round
      * @param {number} x Coordinate x of the cell
@@ -110,7 +113,8 @@ window.onload = () => {
         stopInterval();
       });
       document.getElementById('reset').addEventListener('click', () => {
-        initialize();
+        stateGrid = Array(grid.length).fill('').map((row, x) => Array(grid.height).fill(false));
+        drawGrid();
         stopInterval();
       });
     })();
