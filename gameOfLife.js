@@ -95,6 +95,26 @@ window.onload = () => {
     drawGrid(); 
   });
 
+  // Allow the user to maintain the click of the mouse to draw lines
+  function drawLineLivingCells(e) {
+    stateGrid[Math.floor(e.offsetX/SIZE_CELL)][Math.floor(e.offsetY/SIZE_CELL)] = true;
+  }
+
+  let refresh;
+  let timeoutRefresh;
+  canvas.addEventListener('mousedown', (e) => {
+    timeoutRefresh = setTimeout(() => {
+      document.addEventListener('mousemove', drawLineLivingCells);
+      refresh = setInterval(drawGrid, 100);
+    }, 200);
+  });
+
+  canvas.addEventListener('mouseup', (e) => {
+    document.removeEventListener('mousemove', drawLineLivingCells);
+    clearTimeout(timeoutRefresh);
+    clearInterval(refresh);
+  });
+
   /**
    * Launch of the game
    * Setup of the options (start, stop and reset)
